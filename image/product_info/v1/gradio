@@ -1,0 +1,37 @@
+# import os
+import gc
+import datetime
+import numpy as np
+import pandas as pd
+import gradio as gr
+from glob import glob
+from PIL import Image
+from tqdm.auto import tqdm
+from model import (
+    GRIPImageModelForMultiOuputClassification,
+    GRIPImageModelForMultiOuputClassificationPipeline,
+)
+
+server_name = ""
+server_port = ""
+version = 1
+name = ""
+save_dir = ""
+latest_ckpt = ""
+
+model = GRIPImageModelForMultiOuputClassification.load_from_checkpoint(latest_ckpt)
+pipe = GRIPImageModelForMultiOuputClassificationPipeline(model)
+
+demo = gr.Interface(
+    fn=pipe.inference,
+    inputs=[
+        gr.Radio([""], label="hint"),
+        gr.Image(type="pil"),
+    ],
+    outputs=[
+        gr.Label("category"),
+        gr.Label("color"),
+    ],
+    # examples=examples,
+)
+demo.launch(share=False, inline=True, server_name=server_name, server_port=server_port)
